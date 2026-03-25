@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Immunsystem – Begriffe &amp; Erklärungen</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f2; color: #1a1a1a; padding: 2rem 1rem; }
+  .page { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 26px; font-weight: 600; margin-bottom: 0.3rem; color: #1a1a1a; }
+  .subtitle { font-size: 14px; color: #666; margin-bottom: 1.5rem; }
+  .search-bar { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .search-bar input { flex: 1; padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; }
+  .filter-btns { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filter-btns button { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #555; }
+  .filter-btns button.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .count { font-size: 12px; color: #999; margin-bottom: 1rem; }
+  .term-card { border: 1px solid #e5e5e5; border-radius: 10px; padding: 13px 16px; margin-bottom: 8px; background: #fff; }
+  .term-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .term-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .badge { font-size: 11px; padding: 2px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .badge-sys { background: #dbeafe; color: #1d4ed8; }
+  .badge-proc { background: #d1fae5; color: #065f46; }
+  .term-def { font-size: 13px; color: #555; margin-top: 6px; line-height: 1.65; }
+  @media print {
+    body { background: white; padding: 1rem; }
+    .search-bar, .filter-btns, .count { display: none; }
+    .term-card { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Immunsystem – Begriffe &amp; Erklärungen</h1>
+  <p class="subtitle">Biologie · Alle 52 Begriffe mit Definitionen</p>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Begriff suchen..." oninput="render()">
+  </div>
+  <div class="filter-btns">
+    <button class="active" onclick="setFilter('all',this)">Alle</button>
+    <button onclick="setFilter('sys',this)">Systemelemente</button>
+    <button onclick="setFilter('proc',this)">Begriffe &amp; Abläufe</button>
+  </div>
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+</div>
+<script>
+const terms = [
+  {n:"Abwehrproteine",c:"sys",d:"Proteine im Blut (z.B. Antikörper, Komplementproteine), die Krankheitserreger unschädlich machen oder markieren."},
+  {n:"Antibiotika",c:"proc",d:"Medikamente, die Bakterien abtöten oder deren Vermehrung hemmen. Wirken nicht gegen Viren."},
+  {n:"Antigen",c:"sys",d:"Molekül (oft auf Krankheitserregern), das das Immunsystem als fremd erkennt und eine Abwehrreaktion auslöst."},
+  {n:"Antigen-Rezeptoren",c:"sys",d:"Spezifische Rezeptoren auf B- und T-Lymphozyten, die ein bestimmtes Antigen erkennen und binden."},
+  {n:"Antikörper",c:"sys",d:"Proteine der B-Lymphozyten/Plasmazellen, die spezifisch an Antigene binden und Erreger neutralisieren oder markieren."},
+  {n:"Bakterien",c:"sys",d:"Einzellige Prokaryoten; viele sind harmlos oder nützlich, manche sind Krankheitserreger (pathogen)."},
+  {n:"B-Lymphozyten",c:"sys",d:"Weiße Blutzellen, die im Knochenmark reifen. Bei Aktivierung differenzieren sie zu Plasmazellen und produzieren Antikörper."},
+  {n:"Chemische Barrieren",c:"sys",d:"Körpereigene Stoffe wie Magensäure, Tränenflüssigkeit oder Lysozym, die Erreger chemisch zerstören."},
+  {n:"(eukaryontische) Einzeller",c:"sys",d:"Einzellige Organismen mit Zellkern (z.B. Amöben, Plasmodium). Manche sind Parasiten und können Krankheiten verursachen."},
+  {n:"Eukaryonten",c:"sys",d:"Organismen mit echtem Zellkern, z.B. Tiere, Pflanzen, Pilze, Einzeller. Im Gegensatz zu Prokaryoten."},
+  {n:"Gedächtniszellen",c:"sys",d:"Lang lebende T- und B-Lymphozyten nach einer Infektion. Ermöglichen bei erneutem Kontakt mit dem Erreger eine schnellere, stärkere Immunantwort."},
+  {n:"Knochenmark",c:"sys",d:"Bildungsort aller Blutzellen, darunter die B-Lymphozyten, die hier ausreifen."},
+  {n:"Krankheitserreger",c:"sys",d:"Mikroorganismen oder Partikel (Viren, Bakterien, Pilze, Parasiten), die im Körper Krankheiten verursachen."},
+  {n:"Lymphe",c:"sys",d:"Gewebsflüssigkeit, die über Lymphgefässe gesammelt und zurück ins Blut geleitet wird. Transportiert Immunzellen."},
+  {n:"Lymphknoten",c:"sys",d:"Kleine Organe im Lymphsystem, in denen Immunzellen Krankheitserreger aus der Lymphe herausfiltern."},
+  {n:"Makrophagen",c:"sys",d:"Grosse Fresszellen des Immunsystems. Phagozytieren Erreger und präsentieren Antigene für T-Lymphozyten."},
+  {n:"Mechanische Barrieren",c:"sys",d:"Haut und Schleimhäute, die das Eindringen von Erregern physisch verhindern. Erste Verteidigungslinie des Körpers."},
+  {n:"Parasiten",c:"sys",d:"Organismen, die auf Kosten eines Wirts leben (z.B. Würmer, Plasmodien). Können Krankheiten auslösen."},
+  {n:"Prokaryonten",c:"sys",d:"Organismen ohne echten Zellkern, z.B. Bakterien. Einfacher aufgebaut als Eukaryoten."},
+  {n:"Plasmazellen",c:"sys",d:"Aus B-Lymphozyten entstehende Zellen, die große Mengen Antikörper produzieren und ausschütten."},
+  {n:"T-Helferzellen",c:"sys",d:"T-Lymphozyten, die andere Immunzellen aktivieren und koordinieren (sowohl B-Zellen als auch T-Killerzellen)."},
+  {n:"T-Killerzellen",c:"sys",d:"T-Lymphozyten, die infizierte Körperzellen oder Tumorzellen direkt abtöten (zelluläre Immunantwort)."},
+  {n:"T-Lymphozyten",c:"sys",d:"Im Thymus gereifte weiße Blutzellen. Dazu gehören T-Helferzellen und T-Killerzellen."},
+  {n:"Thymus",c:"sys",d:"Drüse hinter dem Brustbein, in der T-Lymphozyten ausreifen und trainiert werden, Körpereigenes nicht anzugreifen."},
+  {n:"Viren",c:"sys",d:"Nicht-zelluläre Partikel aus Erbgut und Proteinhülle. Vermehren sich nur in lebenden Wirtszellen."},
+  {n:"Wirtszellen",c:"sys",d:"Körperzellen, in die Viren eindringen und sich dort vermehren, oft unter Zerstörung der Zelle."},
+  {n:"Würmer",c:"sys",d:"Vielzellige Parasiten (z.B. Bandwurm, Spulwurm), die im Körper leben und Entzündungen oder Nährstoffmangel verursachen."},
+  {n:"Agglutination",c:"proc",d:"Verklumpung von Erregern durch Antikörper, die mehrere Antigene gleichzeitig binden. Erleichtert das Aufnehmen durch Fresszellen."},
+  {n:"Desinfektion",c:"proc",d:"Massnahme zur Abtötung oder Inaktivierung von Krankheitserregern auf Oberflächen oder Haut (z.B. mit Alkohol)."},
+  {n:"Entzündung",c:"proc",d:"Lokale Abwehrreaktion: vermehrte Durchblutung, Schwellung, Rötung, Wärme. Immunzellen strömen in das betroffene Gebiet."},
+  {n:"Fieber",c:"proc",d:"Erhöhte Körpertemperatur als Abwehrreaktion. Hemmt Erregervermehrung und fördert Immunzellaktivität."},
+  {n:"Humorale Abwehr",c:"proc",d:"Teil der spezifischen Immunabwehr über Antikörper im Blut (Plasma). Wird von B-Lymphozyten und Plasmazellen getragen."},
+  {n:"Immunisierung",c:"proc",d:"Aufbau eines Immunschutzes, entweder durch Infektion oder durch Impfung (aktiv) bzw. Verabreichung von Antikörpern (passiv)."},
+  {n:"Immunität",c:"proc",d:"Zustand des Schutzes vor einer bestimmten Krankheit. Kann natürlich (nach Infektion) oder künstlich (nach Impfung) erworben sein."},
+  {n:"Immunreaktion",c:"proc",d:"Die Gesamtheit aller Abwehrmassnahmen des Immunsystems nach Erkennung eines Antigens."},
+  {n:"Impfung (aktiv, passiv)",c:"proc",d:"Aktive Impfung: abgeschwächte Erreger/Antigene regen eigene Antikörperbildung an. Passive Impfung: fertige Antikörper werden verabreicht."},
+  {n:"Infektion",c:"proc",d:"Eindringen und Vermehrung von Krankheitserregern im Körper. Führt nicht immer zu einer Erkrankung."},
+  {n:"Infektionskrankheit",c:"proc",d:"Erkrankung, die durch Krankheitserreger verursacht wird und übertragbar sein kann."},
+  {n:"Inkubationszeit",c:"proc",d:"Zeitraum zwischen Infektion und dem Auftreten erster Symptome. Variiert je nach Erreger."},
+  {n:"Lyse/lysieren",c:"proc",d:"Auflösung/Zerstörung einer Zelle, z.B. durch Antikörper (Komplementsystem) oder durch T-Killerzellen."},
+  {n:"pathogen",c:"proc",d:"Krankheitsauslösend. Ein pathogener Erreger kann beim Wirt eine Erkrankung verursachen."},
+  {n:"phagozytieren",c:"proc",d:"Das Aufnehmen und Verdauen von Erregern oder Zelltrümmern durch Fresszellen (Phagozytose)."},
+  {n:"Prävention",c:"proc",d:"Massnahmen zur Vorbeugung von Krankheiten, z.B. Hygiene, Impfung, gesunde Ernährung."},
+  {n:"Prophylaxe",c:"proc",d:"Vorbeugende Massnahme, z.B. Medikamentengabe vor möglicher Infektion oder Impfung vor Reise."},
+  {n:"Resistenz",c:"proc",d:"Widerstandsfähigkeit gegen Krankheitserreger (körperlich) oder die Unempfindlichkeit von Erregern gegenüber Antibiotika."},
+  {n:"Spezifische Abwehr",c:"proc",d:"Immunantwort, die gezielt gegen ein bestimmtes Antigen gerichtet ist. Umfasst humorale und zelluläre Abwehr."},
+  {n:"Sterilisieren",c:"proc",d:"Vollständige Abtötung aller Mikroorganismen (inkl. Sporen) durch Hitze, Strahlung oder Chemikalien."},
+  {n:"Symptome",c:"proc",d:"Körperliche Anzeichen einer Erkrankung, z.B. Fieber, Husten, Schmerzen. Können durch den Erreger oder die Immunreaktion entstehen."},
+  {n:"Therapie",c:"proc",d:"Behandlung einer Erkrankung, z.B. mit Antibiotika, Virostatika, Schmerzmitteln oder unterstützenden Massnahmen."},
+  {n:"toxisch",c:"proc",d:"Giftig. Krankheitserreger können Toxine (Gifte) produzieren, die Zellen oder Organe schädigen."},
+  {n:"Übertragung",c:"proc",d:"Weitergabe von Erregern, z.B. Tröpfcheninfektion (Husten), fäkal-oral (Wasser), Stich/Biss oder Körperflüssigkeiten."},
+  {n:"Unspezifische Abwehr",c:"proc",d:"Erste, schnelle Abwehr ohne Erkennung spezifischer Antigene: Barrieren, Fresszellen, Fieber, Entzündung."},
+  {n:"Zelluläre Abwehr",c:"proc",d:"Immunantwort durch direkte Zellaktivität (T-Killerzellen), die infizierte Zellen zerstören. Teil der spezifischen Abwehr."},
+];
+
+let filter = 'all';
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btns button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const list = document.getElementById('list');
+  const count = document.getElementById('count');
+  const filtered = terms.filter(t => {
+    if (filter !== 'all' && t.c !== filter) return false;
+    return t.n.toLowerCase().includes(q) || t.d.toLowerCase().includes(q);
+  });
+  count.textContent = filtered.length + ' Begriff' + (filtered.length === 1 ? '' : 'e');
+  list.innerHTML = filtered.map(t => `
+    <div class="term-card">
+      <div class="term-header">
+        <span class="term-name">${t.n}</span>
+        <span class="badge ${t.c === 'sys' ? 'badge-sys' : 'badge-proc'}">${t.c === 'sys' ? 'Systemelement' : 'Begriff/Ablauf'}</span>
+      </div>
+      <div class="term-def">${t.d}</div>
+    </div>
+  `).join('');
+}
+render();
+</script>
+</body>
+</html>
